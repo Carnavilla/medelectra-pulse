@@ -55,6 +55,16 @@ function SignupPage() {
     });
     if (error) { setLoading(false); return toast.error(error.message); }
 
+    if (data.user) {
+      await supabase.from("registrations").insert({
+        user_id: data.user.id,
+        course_id: form.preferred_course_id || null,
+        full_name: form.full_name,
+        email: form.email,
+        phone: form.phone,
+      });
+    }
+
     // Auto-enroll into preferred course if selected and session exists
     if (form.preferred_course_id && data.user) {
       await supabase.from("enrollments").insert({
