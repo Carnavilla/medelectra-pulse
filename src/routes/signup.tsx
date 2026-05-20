@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AuthShell, inputCls, btnPrimary } from "@/components/AuthShell";
+import { createStudentAccount } from "@/lib/signup.functions";
 
 type SignupSearch = { course?: string };
 
@@ -16,6 +18,7 @@ export const Route = createFileRoute("/signup")({
 
 function SignupPage() {
   const navigate = useNavigate();
+  const createAccount = useServerFn(createStudentAccount);
   const { course: preselected } = Route.useSearch();
   const [form, setForm] = useState({
     full_name: "", email: "", phone: "", password: "", confirm: "",
@@ -41,37 +44,23 @@ function SignupPage() {
     if (form.password !== form.confirm) return toast.error("Passwords don't match");
     if (form.password.length < 6) return toast.error("Password must be at least 6 characters");
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+    try {
+      const result = await createAccount({
         data: {
           full_name: form.full_name,
+          email: form.email,
           phone: form.phone,
+          password: form.password,
           preferred_course_id: form.preferred_course_id || null,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
         },
-      },
-    });
-    if (error) { setLoading(false); return toast.error(error.message); }
-
-    if (data.user) {
-      await supabase.from("registrations").insert({
-        user_id: data.user.id,
-        course_id: form.preferred_course_id || null,
-        full_name: form.full_name,
-        email: form.email,
-        phone: form.phone,
       });
-    }
-
-    // Auto-enroll into preferred course if selected and session exists
-    if (form.preferred_course_id && data.user) {
-      await supabase.from("enrollments").insert({
-        user_id: data.user.id,
-        course_id: form.preferred_course_id,
-        access_granted: true,
-      });
+      if (result.session) {
+        await supabase.auth.setSession(result.session);
+      }
+    } catch (error) {
+      setLoading(false);
+      return toast.error(error instanceof Error ? error.message : "Could not create account");
     }
     setLoading(false);
     toast.success("Account created! Welcome to MedElectra.");
