@@ -7,6 +7,8 @@ import { EcgBackground } from "@/components/EcgBackground";
 import { naira } from "@/lib/format";
 import { ArrowRight, Cpu, Activity, ShieldCheck, Quote } from "lucide-react";
 
+const FALLBACK_IMG = "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1200&q=80&auto=format&fit=crop";
+
 export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
@@ -86,10 +88,19 @@ function Landing() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses?.map((c) => (
             <article key={c.id} className="group rounded-xl border border-border bg-card p-6 flex flex-col teal-glow-hover">
+              <div className="aspect-video -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-xl bg-muted">
+                <img
+                  src={c.thumbnail_url || FALLBACK_IMG}
+                  alt={c.title}
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG; }}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
               <div className="text-xs uppercase tracking-widest text-coral">{naira(c.price)}</div>
               <h3 className="mt-3 text-lg font-semibold leading-tight">{c.title}</h3>
               <p className="mt-3 text-sm text-muted-foreground line-clamp-4 flex-1">{c.description}</p>
-              <Link to="/courses/$id" params={{ id: c.id }}
+              <Link to="/signup" search={{ course: c.id }}
                 className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary group-hover:gap-3 transition-all">
                 Enroll Now <ArrowRight className="w-4 h-4" />
               </Link>
