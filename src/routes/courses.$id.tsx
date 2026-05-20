@@ -37,7 +37,10 @@ function CourseDetail() {
   });
 
   const enroll = async () => {
-    if (!user) { toast.info("Please log in to enroll"); return navigate({ to: "/login" }); }
+    if (!user) {
+      toast.info("Create an account to enroll");
+      return navigate({ to: "/signup", search: { course: id } });
+    }
     setEnrolling(true);
     const { error } = await supabase.from("enrollments")
       .insert({ user_id: user.id, course_id: id, access_granted: true });
