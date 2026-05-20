@@ -192,6 +192,7 @@ export type Database = {
           full_name: string | null
           id: string
           phone: string | null
+          preferred_course_id: string | null
           role: string
         }
         Insert: {
@@ -200,6 +201,7 @@ export type Database = {
           full_name?: string | null
           id: string
           phone?: string | null
+          preferred_course_id?: string | null
           role?: string
         }
         Update: {
@@ -208,6 +210,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone?: string | null
+          preferred_course_id?: string | null
           role?: string
         }
         Relationships: []
