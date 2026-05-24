@@ -31,6 +31,6 @@ export function AuthShell({ title, subtitle, children, footer }: {
 }
 
 export const inputCls =
-  "w-full px-3 py-2.5 rounded-md bg-input/40 border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm";
+  "w-full px-3 py-2.5 rounded-md bg-input/40 border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm bg-slate-950";
 export const btnPrimary =
   "w-full py-2.5 rounded-md bg-primary text-primary-foreground font-semibold teal-glow-hover disabled:opacity-50";
