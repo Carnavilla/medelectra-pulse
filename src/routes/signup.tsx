@@ -73,13 +73,15 @@ function SignupPage() {
         );
       }
     }
-    setLoading(false);
-    toast.success("Account created! Welcome to MedElectra.");
-    if (data.session && courseId) {
-      navigate({ to: "/my-course/$id", params: { id: courseId } });
-    } else {
-      navigate({ to: "/dashboard" });
+    // Mark this email as a fresh signup so the dashboard greets with "Welcome,"
+    try { sessionStorage.setItem("medelectra-new-signup", form.email.toLowerCase()); } catch {}
+    // Always send new users to the login page to authenticate explicitly.
+    if (data.session) {
+      await supabase.auth.signOut();
     }
+    setLoading(false);
+    toast.success("Account created! Please log in to continue.");
+    navigate({ to: "/login" });
   };
 
   return (
