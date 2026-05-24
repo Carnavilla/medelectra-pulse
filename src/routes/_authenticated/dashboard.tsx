@@ -7,11 +7,26 @@ import { Footer } from "@/components/Footer";
 import { Spinner } from "@/components/Spinner";
 import { EcgBackground } from "@/components/EcgBackground";
 import { Megaphone, ArrowRight, User } from "lucide-react";
+import { useMemo } from "react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
 
 function Dashboard() {
   const { user, profile } = useAuth();
+
+  const isNewSignup = useMemo(() => {
+    if (typeof window === "undefined" || !profile?.email) return false;
+    try {
+      const flag = sessionStorage.getItem("medelectra-new-signup");
+      if (flag && flag === profile.email.toLowerCase()) {
+        sessionStorage.removeItem("medelectra-new-signup");
+        return true;
+      }
+    } catch {}
+    return false;
+  }, [profile?.email]);
+
+  const displayName = profile?.full_name?.trim() || profile?.email?.split("@")[0] || "Learner";
 
   const { data: enrollments, isLoading } = useQuery({
     queryKey: ["my-enrollments", user?.id],
@@ -49,7 +64,7 @@ function Dashboard() {
           <EcgBackground />
           <div className="relative">
             <p className="text-xs uppercase tracking-widest text-primary">Dashboard</p>
-            <h1 className="mt-2 text-3xl font-bold">Welcome back, {profile?.full_name?.split(" ")[0] || "Learner"}</h1>
+            <h1 className="mt-2 text-3xl font-bold">{isNewSignup ? "Welcome" : "Welcome back"}, {displayName}</h1>
             <p className="mt-2 text-muted-foreground">Pick up where you left off.</p>
           </div>
         </section>

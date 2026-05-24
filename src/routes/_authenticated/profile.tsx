@@ -47,9 +47,9 @@ function ProfilePage() {
           <div><label className="text-xs uppercase tracking-widest text-muted-foreground">Email</label>
             <input className={inputCls + " mt-1 opacity-60"} disabled value={profile?.email || ""} /></div>
           <div><label className="text-xs uppercase tracking-widest text-muted-foreground">Full Name</label>
-            <input className={inputCls + " mt-1"} value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} /></div>
+            <input className={inputCls + " mt-1"} placeholder="Add your full name" value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} /></div>
           <div><label className="text-xs uppercase tracking-widest text-muted-foreground">Phone</label>
-            <input className={inputCls + " mt-1"} value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} /></div>
+            <input className={inputCls + " mt-1"} placeholder="Add your phone number" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} /></div>
           <button onClick={save} className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-semibold teal-glow-hover">Save changes</button>
         </div>
 
