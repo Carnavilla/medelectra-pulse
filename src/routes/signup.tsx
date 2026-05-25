@@ -41,18 +41,19 @@ function SignupPage() {
     if (form.password !== form.confirm) return toast.error("Passwords don't match");
     if (form.password.length < 6) return toast.error("Password must be at least 6 characters");
     setLoading(true);
-    const courseId = form.preferred_course_id || null;
+    const fullName = form.full_name;
+    const phone = form.phone;
+    const selectedCourseId = form.preferred_course_id || null;
     const { data, error } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
         data: {
-          full_name: form.full_name,
-          phone: form.phone,
-          preferred_course_id: courseId,
-        },
-      },
+          full_name: fullName,
+          phone: phone,
+          preferred_course_id: selectedCourseId
+        }
+      }
     });
     if (error) { setLoading(false); return toast.error(error.message); }
     const userId = data.user?.id;
@@ -61,14 +62,14 @@ function SignupPage() {
     if (data.session && userId) {
       await supabase.from("registrations").insert({
         user_id: userId,
-        course_id: courseId,
-        full_name: form.full_name,
+        course_id: selectedCourseId,
+        full_name: fullName,
         email: form.email,
-        phone: form.phone,
+        phone: phone,
       });
-      if (courseId) {
+      if (selectedCourseId) {
         await supabase.from("enrollments").upsert(
-          { user_id: userId, course_id: courseId, access_granted: true },
+          { user_id: userId, course_id: selectedCourseId, access_granted: true },
           { onConflict: "user_id,course_id" },
         );
       }
