@@ -38,3 +38,10 @@ externalPort = 80
 deploymentTarget = "autoscale"
 run = ["bun", "run", "preview"]
 build = ["bun", "run", "build"]
+
+[userenv]
+
+[userenv.shared]
+SUPABASE_URL = "https://oyfuknyazahhaqealwnk.supabase.co"
+VITE_SUPABASE_URL = "https://oyfuknyazahhaqealwnk.supabase.co"
+VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95ZnVrbnlhemFoaGFxZWFsd25rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMzA5NjIsImV4cCI6MjA5NDYwNjk2Mn0.J1kN146nvnsQBlz3Qv25RSSo-F5lrTODfQ4X4eJwskQ"
