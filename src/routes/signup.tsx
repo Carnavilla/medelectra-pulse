@@ -44,7 +44,9 @@ function SignupPage() {
     const fullName = form.full_name;
     const phone = form.phone;
     const selectedCourseId = form.preferred_course_id || null;
-    const { data, error } = await supabase.auth.signUp({
+    console.log("[signup] form state:", { full_name: form.full_name, phone: form.phone, preferred_course_id: form.preferred_course_id });
+    console.log("[signup] variables:", { fullName, phone, selectedCourseId });
+    const signUpPayload = {
       email: form.email,
       password: form.password,
       options: {
@@ -54,7 +56,9 @@ function SignupPage() {
           preferred_course_id: selectedCourseId
         }
       }
-    });
+    };
+    console.log("[signup] full signUp payload:", JSON.stringify(signUpPayload, null, 2));
+    const { data, error } = await supabase.auth.signUp(signUpPayload);
     if (error) { setLoading(false); return toast.error(error.message); }
     const userId = data.user?.id;
     // If we already have a session (auto-confirm on), persist registration + enrollment.
