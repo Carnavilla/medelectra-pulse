@@ -8,6 +8,7 @@ import { Spinner } from "@/components/Spinner";
 import { EcgBackground } from "@/components/EcgBackground";
 import { Megaphone, ArrowRight, User } from "lucide-react";
 import { naira } from "@/lib/format";
+import { useState, useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
 
@@ -22,6 +23,19 @@ function Dashboard() {
   const { user, profile, loading: authLoading } = useAuth();
 
   const displayName = profile?.full_name?.trim() || user?.email?.split("@")[0] || "Learner";
+
+  const [isNewUser, setIsNewUser] = useState(false);
+  useEffect(() => {
+    if (!user?.email) return;
+    try {
+      const key = "medelectra-new-signup";
+      const stored = sessionStorage.getItem(key);
+      if (stored && stored === user.email.toLowerCase()) {
+        setIsNewUser(true);
+        sessionStorage.removeItem(key);
+      }
+    } catch {}
+  }, [user?.email]);
 
   const { data: enrollments, isLoading: enrollmentsLoading } = useQuery({
     queryKey: ["my-enrollments", user?.id],
@@ -69,9 +83,11 @@ function Dashboard() {
           <div className="relative">
             <p className="text-xs uppercase tracking-widest text-primary">Dashboard</p>
             <h1 className="mt-2 text-3xl font-bold">
-              Welcome back, {authLoading ? "…" : displayName}
+              {isNewUser ? "Welcome, " : "Welcome back, "}{authLoading ? "…" : displayName}
             </h1>
-            <p className="mt-2 text-muted-foreground">Pick up where you left off.</p>
+            <p className="mt-2 text-muted-foreground">
+              {isNewUser ? "Your account is ready. Start exploring your courses." : "Pick up where you left off."}
+            </p>
           </div>
         </section>
 
@@ -96,7 +112,7 @@ function Dashboard() {
                 {enrollments.map((course) => (
                   <Link
                     key={course.id}
-                    to="/courses/$id"
+                    to="/my-course/$id"
                     params={{ id: course.id }}
                     className="rounded-xl border border-border bg-card p-5 flex flex-col teal-glow-hover"
                   >
