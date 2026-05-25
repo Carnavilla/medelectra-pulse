@@ -7,8 +7,16 @@ import { Footer } from "@/components/Footer";
 import { Spinner } from "@/components/Spinner";
 import { EcgBackground } from "@/components/EcgBackground";
 import { Megaphone, ArrowRight, User } from "lucide-react";
+import { naira } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
+
+type EnrolledCourse = {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+};
 
 function Dashboard() {
   const { user, profile, loading: authLoading } = useAuth();
@@ -21,10 +29,19 @@ function Dashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("enrollments")
-        .select("id, course_id, courses(id, title, description)")
-        .eq("user_id", user!.id);
+        .select(`
+          course_id,
+          courses (
+            id,
+            title,
+            description,
+            price
+          )
+        `)
+        .eq("user_id", user!.id)
+        .eq("access_granted", true);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []).map((e) => e.courses as EnrolledCourse | null).filter(Boolean) as EnrolledCourse[];
     },
   });
 
@@ -52,7 +69,7 @@ function Dashboard() {
           <div className="relative">
             <p className="text-xs uppercase tracking-widest text-primary">Dashboard</p>
             <h1 className="mt-2 text-3xl font-bold">
-              Welcome{profile ? "" : " back"}, {authLoading ? "…" : displayName}
+              Welcome back, {authLoading ? "…" : displayName}
             </h1>
             <p className="mt-2 text-muted-foreground">Pick up where you left off.</p>
           </div>
@@ -76,26 +93,23 @@ function Dashboard() {
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 gap-4">
-                {enrollments.map((e) => {
-                  const course = e.courses as { id: string; title: string; description: string } | null;
-                  if (!course) return null;
-                  return (
-                    <Link
-                      key={e.id}
-                      to="/courses/$id"
-                      params={{ id: course.id }}
-                      className="rounded-xl border border-border bg-card p-5 flex flex-col teal-glow-hover"
-                    >
-                      <h3 className="font-semibold leading-tight">{course.title}</h3>
-                      <p className="mt-2 text-sm text-muted-foreground line-clamp-3 flex-1">
-                        {course.description}
-                      </p>
-                      <div className="mt-4 text-sm text-primary inline-flex items-center gap-1">
-                        View Course <ArrowRight className="w-4 h-4" />
-                      </div>
-                    </Link>
-                  );
-                })}
+                {enrollments.map((course) => (
+                  <Link
+                    key={course.id}
+                    to="/courses/$id"
+                    params={{ id: course.id }}
+                    className="rounded-xl border border-border bg-card p-5 flex flex-col teal-glow-hover"
+                  >
+                    <div className="text-sm font-semibold text-primary">{naira(course.price)}</div>
+                    <h3 className="mt-1 font-semibold leading-tight">{course.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground line-clamp-3 flex-1">
+                      {course.description}
+                    </p>
+                    <div className="mt-4 text-sm text-primary inline-flex items-center gap-1">
+                      View Course <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
