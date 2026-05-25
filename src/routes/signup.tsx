@@ -59,6 +59,7 @@ function SignupPage() {
     };
     console.log("[signup] full signUp payload:", JSON.stringify(signUpPayload, null, 2));
     const { data, error } = await supabase.auth.signUp(signUpPayload);
+    console.log("[signup] Supabase response — error:", error, "| user:", data?.user?.id, "| meta:", data?.user?.user_metadata);
     if (error) { setLoading(false); return toast.error(error.message); }
     const userId = data.user?.id;
     // If we already have a session (auto-confirm on), persist registration + enrollment.
