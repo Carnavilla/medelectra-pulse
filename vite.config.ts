@@ -12,6 +12,13 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
+  vite: {
+    server: {
+      host: "0.0.0.0",
+      port: 5000,
+      allowedHosts: true,
+    },
+  },
 });
 "scripts": {
   "start": "vite preview --port 5000 --host 0.0.0.0"
